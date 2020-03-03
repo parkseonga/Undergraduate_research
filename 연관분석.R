@@ -5,31 +5,6 @@ library(d3Network)
 library(igraph)
 library(arules)
 
-setwd("E:\\ÇÐ±³È°µ¿\\¿¬±¸È°µ¿\\Æê¹Ú½º")
-
-pet<-read_xlsx("190402_ÀÏºÎÁÖ¹®Á¤º¸(17_19³âµµ)_»çÀºÇ°Á¦¿Ü_v1.xlsx")
-head(pet)
-summary(pet)
-
-# ÀÓ½Ã°í°´¹øÈ£¿¡ ¿¡·¯ °ª»èÁ¦
-pet<-subset(pet,!is.na(pet$ÀÓ½Ã°í°´¹øÈ£))
-nrow(pet)
-
-# ÀÓ½Ã°í°´¹øÈ£ + »óÇ°ÁÖ¹®½Ã°£
-pet_name<- paste(pet$ÀÓ½Ã°í°´¹øÈ£,pet$ÁÖ¹®ÀÏ½Ã)
-head(pet_name)
-
-
-# °°Àº °í°´ÁÖ¹®º°·Î ³ª´®
-pet.list_category<-split(pet$Ä«Å×°í¸®¸í,pet_name)
-pet.list_code<-split(pet$»óÇ°ÄÚµå,pet_name)
-
-# transactionÇüÅÂ·Î º¯È¯
-pet_trans_category<-as(pet.list_category,"transactions")
-pet_trans_code<-as(pet.list_code,"transactions")
-summary(pet_trans_category)
-summary(pet_trans_code)
-
 if (!require("RColorBrewer")) {
   # install color package of R
   install.packages("RColorBrewer")
@@ -37,15 +12,37 @@ if (!require("RColorBrewer")) {
   library(RColorBrewer)
 }
 
+pet<-read_xlsx("190402_ì¼ë¶€ì£¼ë¬¸ì •ë³´(17_19ë…„ë„)_ì‚¬ì€í’ˆì œì™¸_v1.xlsx")
+head(pet)
+summary(pet)
 
-# item ºóµµ ÆÄ¾Ç
+# ìž„ì‹œê³ ê°ë²ˆí˜¸ì— ì—ëŸ¬ ê°’ì‚­ì œ
+pet<-subset(pet,!is.na(pet$ìž„ì‹œê³ ê°ë²ˆí˜¸))
+nrow(pet)
+
+# ìž„ì‹œê³ ê°ë²ˆí˜¸ + ìƒí’ˆì£¼ë¬¸ì‹œê°„
+pet_name<- paste(pet$ìž„ì‹œê³ ê°ë²ˆí˜¸,pet$ì£¼ë¬¸ì¼ì‹œ)
+head(pet_name)
+
+
+# ê°™ì€ ê³ ê°ì£¼ë¬¸ë³„ë¡œ ë‚˜ëˆ”
+pet.list_category<-split(pet$ì¹´í…Œê³ ë¦¬ëª…,pet_name)
+pet.list_code<-split(pet$ìƒí’ˆì½”ë“œ,pet_name)
+
+# transactioní˜•íƒœë¡œ ë³€í™˜
+pet_trans_category<-as(pet.list_category,"transactions")
+pet_trans_code<-as(pet.list_code,"transactions")
+summary(pet_trans_category)
+summary(pet_trans_code)
+
+# item ë¹ˆë„ íŒŒì•…
 itemFrequencyPlot(pet_trans_category,topN=20,type="absolute",col=brewer.pal(8,'Pastel2'), main="Absolute Item Frequency Plot")
 itemFrequencyPlot(pet_trans_code,topN=20,type="absolute",col=brewer.pal(8,'Pastel2'), main="Absolute Item Frequency Plot")
 
 # aprior
 pet_rules_category<-apriori(pet_trans_category,parameter = list(supp=0.0005, conf = 0.5, minlen=2))
-pet_rules_code<-apriori(pet_trans_code,parameter = list(supp=0.0005,conf=0.9)) # 100°³ ±ÔÄ¢ »ý¼º
-# pet_rules_code<-apriori(pet_trans_code,parameter = list(supp=0.005)) # 0°³ ±ÔÄ¢ »ý¼º
+pet_rules_code<-apriori(pet_trans_code,parameter = list(supp=0.0005,conf=0.9)) # 100ê°œ ê·œì¹™ ìƒì„±
+# pet_rules_code<-apriori(pet_trans_code,parameter = list(supp=0.005)) # 0ê°œ ê·œì¹™ ìƒì„±
 # pet_rules_code<-apriori(pet_trans_code,parameter = list(supp=0.0005, conf = 0.5, minlen=3))
 
 summary(pet_rules_category)
