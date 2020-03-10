@@ -1,5 +1,5 @@
 # item_recommend
-### preinstalled
+### pre-installed
 - readxl
 - devtools
 - RCurl
