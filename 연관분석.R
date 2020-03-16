@@ -1,3 +1,4 @@
+# 패키지 설치 
 library(readxl)
 library(devtools)
 library(RCurl)
@@ -12,10 +13,14 @@ if (!require("RColorBrewer")) {
   library(RColorBrewer)
 }
 
-pet<-read_xlsx("190402_일부주문정보(17_19년도)_사은품제외_v1.xlsx")
+# 데이터 불러오기
+pet<-read_xlsx("data.xlsx")
 head(pet)
+
+# 요약값 확인
 summary(pet)
 
+## 고객번호와 상품주무시간을 합쳐 동시에 구매하는 아이템 희소 행렬 생성
 # 임시고객번호에 에러 값삭제
 pet<-subset(pet,!is.na(pet$임시고객번호))
 nrow(pet)
@@ -29,16 +34,18 @@ head(pet_name)
 pet.list_category<-split(pet$카테고리명,pet_name)
 pet.list_code<-split(pet$상품코드,pet_name)
 
-# transaction형태로 변환
+# 희소행렬로 생성
 pet_trans_category<-as(pet.list_category,"transactions")
 pet_trans_code<-as(pet.list_code,"transactions")
 summary(pet_trans_category)
 summary(pet_trans_code)
 
+## 데이터 탐색
 # item 빈도 파악
 itemFrequencyPlot(pet_trans_category,topN=20,type="absolute",col=brewer.pal(8,'Pastel2'), main="Absolute Item Frequency Plot")
 itemFrequencyPlot(pet_trans_code,topN=20,type="absolute",col=brewer.pal(8,'Pastel2'), main="Absolute Item Frequency Plot")
 
+## 알고리즘 적용
 # aprior
 pet_rules_category<-apriori(pet_trans_category,parameter = list(supp=0.0005, conf = 0.5, minlen=2))
 pet_rules_code<-apriori(pet_trans_code,parameter = list(supp=0.0005,conf=0.9)) # 100개 규칙 생성
@@ -48,13 +55,14 @@ pet_rules_code<-apriori(pet_trans_code,parameter = list(supp=0.0005,conf=0.9)) #
 summary(pet_rules_category)
 summary(pet_rules_code)
 
+# 규칙 및 성능 확인
 inspect(pet_rules_category)
 inspect(pet_rules_code)
 
+# 결과 시각화(네트워크 분석 시각화 이용)
 rules <- labels(pet_rules_code, ruleSep=" ") 
 rules <- sapply(rules, strsplit, " ", USE.NAMES=F)
 rulemat <- do.call("rbind", rules)
-
 
 ruleg <- graph.edgelist(rulemat, directed=F)
 g1<-ruleg
